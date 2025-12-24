@@ -2,18 +2,20 @@
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![Tech Stack](https://img.shields.io/badge/stack-JavaEE%20%7C%20JSF%20%7C%20CDI%20%7C%20JPA-blue)
-[cite_start]![Coverage](https://img.shields.io/badge/coverage-90%25-green) > **课程名称**：专业综合实训课程 [cite: 73]
-> [cite_start]**指导教师**：刘犇 [cite: 83]
-> [cite_start]**开发团队**：孙彬祺 (224010119) / 林兴博 (224010117) [cite: 79, 81]
-> [cite_start]**班级**：计算机科学与技术 2班 [cite: 75, 77]
+![Coverage](https://img.shields.io/badge/coverage-90%25-green)
+
+> **课程名称**：专业综合实训课程
+> **指导教师**：刘犇
+> **开发团队**：孙彬祺 (224010119) / 林兴博 (224010117)
+> **班级**：计算机科学与技术 2班
 
 ---
 
 ## 📚 核心交付物导航 (Deliverables)
 
-本项目采用 **AI Native** 模式开发，以下是核心过程记录：
+本项目采用 **AI Native** (Code by AI, Curated by Human) 模式开发，以下是核心过程记录：
 
-- **🧠 [ME-log.md (心理执行日志)](./ME-log.md)**: 记录了作为“策展人”对 AI 生成代码的业务逻辑解释、幻觉修正及 V&V 过程。
+- **🧠 [ME-log.md (心理执行日志)](./ME-log.md)**: 记录了作为“策展人”对 AI 生成代码的业务逻辑解释、幻觉修正（如 User 实体绑定修复）及 V&V 过程。
 - **🤖 [AI-log.md (AI 交互日志)](./AI-log.md)**: 包含完整的 Prompt 历史与 AI 协作迭代记录。
 - **📄 [详细设计文档](./docs/)**: 包含需求分析、数据库设计与类图。
 
@@ -21,34 +23,34 @@
 
 ## 🛠️ 项目简介 (Introduction)
 
-[cite_start]本项目旨在利用 **Java EE** 技术栈开发一个功能完善的 B2C 在线商城系统。系统解决了传统销售模式的地域限制，实现了用户管理、商品展示、在线交易及积分激励等核心功能 [cite: 100]。
+本项目利用 **Java EE** 技术栈开发了一个功能完善的 B2C 在线商城系统。系统解决了传统销售模式的地域限制，实现了用户管理、商品展示、在线交易及积分激励等核心功能。
 
 ### 🌟 核心功能
-1.  [cite_start]**用户管理**: 支持注册、登录（含管理员/普通用户权限区分）及个人信息修改 [cite: 108, 143]。
-2.  [cite_start]**商品管理**: 管理员可进行 CRUD 操作（名称、库存、图片等），用户可浏览与搜索 [cite: 109, 147]。
-3.  [cite_start]**订单系统**: 完整的购物车流程，支持订单提交、支付（状态流转 PENDING -> PAID）及取消 [cite: 110, 150]。
+1.  **用户管理**: 支持注册、登录（含管理员/普通用户权限区分）及个人信息修改。
+2.  **商品管理**: 管理员可进行 CRUD 操作（名称、库存、图片等），用户可浏览与搜索。
+3.  **订单系统**: 完整的购物车流程，支持订单提交、支付（状态流转 PENDING -> PAID）及取消。
 4.  **积分激励**:
-    * [cite_start]**获取**: 消费 10 元积 1 分 [cite: 111]。
-    * [cite_start]**抵扣**: 结账时支持积分抵扣（100 积分抵 1 元）[cite: 111, 241]。
+    * **获取**: 消费 10 元积 1 分。
+    * **抵扣**: 结账时支持积分抵扣（100 积分抵 1 元）。
 
 ---
 
 ## 🏗️ 技术架构 (Technical Architecture)
 
-[cite_start]本项目采用标准的 **MVC 分层架构**，确保模块化与解耦 [cite: 187]：
+本项目采用标准的 **MVC 分层架构**，确保模块化与解耦：
 
 | 层级 | 技术方案 | 说明 |
 | :--- | :--- | :--- |
-| **表现层 (View)** | **JSF (JavaServer Faces)** | [cite_start]构建动态 Web 界面 (`.xhtml`)，提供良好的用户交互 [cite: 114, 188]。 |
-| **控制层 (Controller)** | **CDI (Managed Beans)** | [cite_start]处理 `OrderController`, `ProductController` 等业务调度与依赖注入 [cite: 115, 189]。 |
-| **持久层 (Model)** | **JPA (Hibernate)** | [cite_start]通过 ORM 映射操作 MySQL 数据库 [cite: 116, 191]。 |
-| **服务器** | **Tomcat 11** | [cite_start]运行环境 [cite: 117]。 |
+| **表现层 (View)** | **JSF (JavaServer Faces)** | 构建动态 Web 界面 (`.xhtml`)，提供良好的用户交互。 |
+| **控制层 (Controller)** | **CDI (Managed Beans)** | 处理 `OrderController`, `ProductController` 等业务调度与依赖注入。 |
+| **持久层 (Model)** | **JPA (Hibernate)** | 通过 ORM 映射操作 MySQL 数据库。 |
+| **服务器** | **Tomcat 11** | 运行环境。 |
 
 ---
 
 ## 💾 数据库设计 (Database Schema)
 
-[cite_start]系统基于 MySQL 构建，包含 5 张核心表 [cite: 136, 206]：
+系统基于 MySQL 构建，包含 5 张核心表：
 
 * `users`: 存储用户凭证与角色。
 * `products`: 商品详情与库存。
@@ -69,10 +71,10 @@
 ### 部署步骤
 1.  **克隆仓库**:
     ```bash
-    git clone [https://github.com/2421380971sun/OnlineShop.git]
+    git clone [你的仓库地址]
     ```
 2.  **数据库配置**:
-    * 创建数据库 `mydb` [cite: 136]。
+    * 创建数据库 `mydb`。
     * 运行 `/sql/init.sql` 脚本初始化表结构。
     * 修改 `src/main/resources/META-INF/persistence.xml` 中的数据库连接信息。
 3.  **构建与运行**:
@@ -87,9 +89,9 @@
 
 | 时间节点 | 达成目标 | 详细成果 |
 | :--- | :--- | :--- |
-| **Week 16 周五** | **基础环境与用户模块** | [cite_start]完成 JPA/CDI 环境搭建；实现用户注册登录；解决属性绑定异常 [cite: 220, 226]。 |
-| **Week 17 周二** | **商品与核心交易** | [cite_start]完成商品 CRUD；实现购物车逻辑；打通下单流程 (OrderService) [cite: 229, 235]。 |
-| **Week 17 周三** | **积分集成与交付** | [cite_start]实现积分抵扣 (100:1) 与赠送 (10:1)；完成支付/取消状态流转；修复冗余页面 [cite: 239, 241, 245]。 |
+| **Week 16 周五** | **基础环境与用户模块** | 完成 JPA/CDI 环境搭建；实现用户注册登录；解决属性绑定异常。 |
+| **Week 17 周二** | **商品与核心交易** | 完成商品 CRUD；实现购物车逻辑；打通下单流程 (OrderService)。 |
+| **Week 17 周三** | **积分集成与交付** | 实现积分抵扣 (100:1) 与赠送 (10:1)；完成支付/取消状态流转；修复冗余页面。 |
 
 ---
 
@@ -97,8 +99,8 @@
 
 作为策展人，我们对 AI 生成的代码进行了严格的 **心理执行 (Mental Execution)**：
 * **逻辑验证**: 重点审查了积分抵扣的双向逻辑（抵扣与赠送）是否存在死循环或计算精度丢失。
-* [cite_start]**幻觉修正**: 修正了开发早期 AI 生成的 User 实体属性绑定错误 。
-* [cite_start]**冗余优化**: 删除了 AI 生成的冗余文件 `product_list_user.xhtml`，统一了视图入口 。
+* **幻觉修正**: 修正了开发早期 AI 生成的 User 实体属性绑定错误，以及枚举类型不匹配问题。
+* **冗余优化**: 删除了 AI 生成的冗余文件 `product_list_user.xhtml`，统一了视图入口。
 
 详细记录请查阅 [ME-log.md](./ME-log.md)。
 
