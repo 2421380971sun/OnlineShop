@@ -5,8 +5,11 @@
 ![Coverage](https://img.shields.io/badge/coverage-90%25-green)
 
 > **课程名称**：专业综合实训课程
+> 
 > **指导教师**：刘犇
+> 
 > **开发团队**：孙彬祺 (224010119) / 林兴博 (224010117)
+> 
 > **班级**：计算机科学与技术 2班
 
 ---
@@ -71,7 +74,7 @@
 ### 部署步骤
 1.  **克隆仓库**:
     ```bash
-    git clone [你的仓库地址]
+    git clone [https://github.com/2421380971sun/OnlineShop.git]
     ```
 2.  **数据库配置**:
     * 创建数据库 `mydb`。
