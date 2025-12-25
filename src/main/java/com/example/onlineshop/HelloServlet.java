@@ -1,4 +1,4 @@
-package com.itheima.onlineshop;
+package com.example.onlineshop;
 
 import java.io.*;
 
