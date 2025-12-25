@@ -60,7 +60,7 @@
 * `orders`: 订单主表。
 * `order_items`: 订单详情项。
 * `point_records`: 积分变动流水。
-![E-R图](./images/assets/E-R.png)
+![E-R图](./images/assets/E-R图.png)
 ---
 
 ## 🚀 快速开始 (Quick Start)
