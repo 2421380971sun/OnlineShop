@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>商品列表 - 在线购物平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6b7280, #3b82f6);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .title {
+            font-size: 2rem;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .welcome-text {
+            color: #4b5563;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        .user-links a {
+            color: #3b82f6;
+            text-decoration: none;
+            margin-left: 1rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .user-links a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .filter-form {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .form-label {
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .form-select {
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .product-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        .product-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+        .product-card p {
+            margin: 0.3rem 0;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .product-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .action-btn.cart {
+            background: #3b82f6;
+            color: white;
+        }
+        .action-btn.cart:hover {
+            background: #2563eb;
+        }
+        .action-btn.edit {
+            background: #10b981;
+            color: white;
+        }
+        .action-btn.edit:hover {
+            background: #059669;
+        }
+        .action-btn.delete {
+            background: #ef4444;
+            color: white;
+        }
+        .action-btn.delete:hover {
+            background: #dc2626;
+        }
+        .add-product {
+            text-align: center;
+        }
+        .add-product a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .add-product a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .error-messages {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="container">
+        <h1 class="title">商品列表</h1>
+        <p class="welcome-text">发现适合你的优质商品！</p>
+
+        <!-- 错误信息 -->
+        <h:messages globalOnly="false" styleClass="error-messages" layout="table"/>
+
+        <!-- 用户信息 -->
+        <h:form>
+            <div class="user-info">
+                <span>欢迎，#{authController.isLoggedIn() ? authController.currentUser.nickname : '游客'}！</span>
+                <div class="user-links">
+                    <h:commandLink value="购物车" action="#{orderController.goToCart}"
+                                   styleClass="link" rendered="#{authController.isLoggedIn()}"/>
+                    <h:commandLink value="我的订单" action="#{orderController.goToOrders}"
+                                   styleClass="link" rendered="#{authController.isLoggedIn()}"/>
+                    <h:commandLink value="我的积分" action="#{pointController.goToPoints}"
+                                   styleClass="link" rendered="#{authController.isLoggedIn()}"/>
+                    <h:commandLink value="管理用户" action="user_management?faces-redirect=true"
+                                   styleClass="link" rendered="#{authController.isLoggedIn() and authController.currentUser.role == 'ADMIN'}"/>
+                    <h:commandLink value="退出登录" action="#{authController.logout}"
+                                   styleClass="link" rendered="#{authController.isLoggedIn()}"/>
+                    <h:commandLink value="登录" action="login.faces"
+                                   styleClass="link" rendered="#{not authController.isLoggedIn()}">
+                        <f:param name="faces-redirect" value="true"/>
+                    </h:commandLink>
+                </div>
+            </div>
+        </h:form>
+
+        <!-- 分类筛选 -->
+        <h:form styleClass="filter-form">
+            <label class="form-label">分类：</label>
+            <h:selectOneMenu value="#{productController.selectedCategory}" styleClass="form-select">
+                <f:selectItem itemLabel="全部" itemValue=""/>
+                <f:selectItem itemLabel="电子产品" itemValue="电子产品"/>
+                <f:selectItem itemLabel="服装" itemValue="服装"/>
+                <f:selectItem itemLabel="食品" itemValue="食品"/>
+            </h:selectOneMenu>
+            <h:commandButton value="筛选" styleClass="btn"/>
+        </h:form>
+
+        <!-- 商品卡片 -->
+        <h:form>
+            <div class="product-grid">
+                <ui:repeat value="#{productController.productsByCategory}" var="prod">
+                    <div class="product-card">
+                        <h:graphicImage value="#{prod.imageUrl != null and prod.imageUrl != '' ? prod.imageUrl : '/resources/images/placeholder.jpg'}"
+                                        styleClass="product-image"
+                                        alt="#{prod.name}"/>
+                        <h3>#{prod.name}</h3>
+                        <p>价格：￥#{prod.price}</p>
+                        <p>库存：#{prod.stock}</p>
+                        <p>分类：#{prod.category}</p>
+                        <div class="product-actions">
+                            <h:commandButton value="加入购物车" action="#{orderController.addToCart(prod.id, 1)}"
+                                             styleClass="action-btn cart" rendered="#{authController.isLoggedIn()}"/>
+                            <h:commandLink value="编辑" action="#{productController.editProduct(prod.id)}"
+                                           styleClass="action-btn edit"
+                                           rendered="#{authController.isLoggedIn() and authController.currentUser.role == 'ADMIN'}"/>
+                            <h:commandLink value="删除" action="#{productController.deleteProduct(prod.id)}"
+                                           styleClass="action-btn delete"
+                                           rendered="#{authController.isLoggedIn() and authController.currentUser.role == 'ADMIN'}"/>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </h:form>
+
+        <!-- 添加商品 -->
+        <h:form>
+            <div class="add-product">
+                <h:commandLink value="添加新商品" action="#{productController.goToAddProduct}"
+                               styleClass="link"
+                               rendered="#{authController.isLoggedIn() and authController.currentUser.role == 'ADMIN'}"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>
