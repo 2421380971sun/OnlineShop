@@ -12,7 +12,7 @@ AI 认可该组合，但指出 Tomcat 仅支持 Web Profile，建议使用 Payar
 **Curator Evaluation:**
 - **Valid:** 分层架构建议非常清晰，直接采纳。
 - **Critique:** 更换服务器（Payara）需要重新配置环境，且 Tomcat 11 对 Jakarta EE 10 支持已足够满足本项目需求。  
-  **Action:** 采纳分层结构设计，保留 Tomcat，手动在 `pom.xml` 配置必要的 Jakarta 依赖。
+- **Action:** 采纳分层结构设计，保留 Tomcat，手动在 `pom.xml` 配置必要的 Jakarta 依赖。
 
 ---
 ## Interaction 2: 支付与积分扣减的事务风险
@@ -27,7 +27,7 @@ AI 识别了 1. 重复支付、2. 部分失败（积分扣了订单没成）、3
 这是最有价值的一次交互。AI 正确识别了风险，但给出的方案对于 2 周的课程项目来说过于“重型”。
 - **Selection:** 我提取了 **容器管理事务（CMT）** 的核心概念。
 - **Modification:** 我没有引入 `@Version` 乐观锁字段（避免复杂化前端异常处理），而是选择在 `@Transactional` 方法内部进行严格的逻辑检查（`if (pointsUsed > user.getPoints()) throw Exception`）。  
-  **Action:** 编写了 `OrderService.java`，利用简单的 `@Transactional` 注解包裹整个下单过程，确保原子性。
+- **Action:** 编写了 `OrderService.java`，利用简单的 `@Transactional` 注解包裹整个下单过程，确保原子性。
 
 ---
 ## Interaction 3: 数据库实体模型设计
@@ -40,7 +40,7 @@ AI 建议 `PointRecord` 必须存在以用于审计，并**强烈建议避免在
 
 **Curator Evaluation:**
 - **Insight:** 这一点非常关键。如果我在 User 里放一个 Order 列表，查询用户时可能会拖慢整个系统。  
-  **Action:**
+- **Action:**
 1. 采纳建议：在 `User` 实体中删除了订单列表引用。
 2. 采纳建议：建立了 `PointRecord` 表，用于记录每一次积分变动（来源、数值、时间），实现了系统的可追溯性。
 ---
@@ -55,7 +55,7 @@ AI 提供了完整的 `pom.xml`，正确处理了 Tomcat 环境下的 CDI（Weld
 **Curator Evaluation:**
 - **Accuracy:** AI 准确识别了 Tomcat 环境的特殊性（不支持 JTA），并给出了正确的 Hibernate 配置：`hibernate.transaction.coordinator_class=jdbc`。
 - **Completeness:** 提供的 `web.xml` 包含了必要的 JSF 和 CDI 监听器配置，具备可直接运行的完整度。  
-  **Action:** 直接使用生成的 XML 文件，但移除了 `persistence.xml` 中关于二级缓存的配置，以简化开发与调试阶段的复杂度。
+- **Action:** 直接使用生成的 XML 文件，但移除了 `persistence.xml` 中关于二级缓存的配置，以简化开发与调试阶段的复杂度。
 ---
 ## Interaction 5: 后端实体类生成 (Backend Entities)
 **Context:** 项目骨架搭建完毕，开始编写业务实体。  
@@ -68,7 +68,7 @@ AI 生成了标准的 JavaBean 代码，包含了所有请求的字段、Getter/
 **Curator Evaluation:**
 - **Compliance:** AI 完美遵守了 "不使用 Lombok" 和 "使用 String" 的指令。
 - **Critique:** 虽然 AI 听话，但作为架构师（Curator），我意识到 Prompt 中的设计有缺陷。String 类型的角色字段是“坏味道（Bad Smell）”。  
-  **Action:** 接受 AI 生成的大部分样板代码（Getter/Setter/JPA注解），但在合并到代码库时，**手动将 `role` 字段重构为枚举类型**，并修改了对应的数据库映射配置。  
+- **Action:** 接受 AI 生成的大部分样板代码（Getter/Setter/JPA注解），但在合并到代码库时，**手动将 `role` 字段重构为枚举类型**，并修改了对应的数据库映射配置。  
   *(Self-Correction: 下次 Prompt 应直接要求生成 Enum 类型)*
 ---
 ## Interaction 6: 业务服务层实现 (Service Layer)
@@ -82,5 +82,18 @@ AI 生成了 `UserService`，使用了标准的 JPQL 查询用户。
 **Curator Evaluation:**
 - **Integration:** AI 默认假设环境中有完整的 CDI 容器，代码中使用了 `@Inject EntityManager em;`。
 - **Adaptation:** 由于我决定使用 `PersistenceUtil` 静态工厂，我需要修改 AI 生成的代码。  
-  **Action:**  
-  将直接注入 `EntityManager` 修改为注入 `PersistenceUtil`，并在方法内部调用 `persistenceUtil.getEntityManager()` 来获取连接。这确保了代码在 Tomcat 环境下能稳定运行。
+- **Action:** 将直接注入 `EntityManager` 修改为注入 `PersistenceUtil`，并在方法内部调用 `persistenceUtil.getEntityManager()` 来获取连接。这确保了代码在 Tomcat 环境下能稳定运行。
+---
+## Interaction 7: 核心业务逻辑实现 (Core Implementation)
+**Context:** 实体类已就位，开始编写 Service 层。
+
+**Prompt:** "请生成 OrderService.java... createOrder 需开启事务、库存检查、100积分抵1元... payOrder 需扣除积分、累积积分、记录流水..." 
+
+**AI Response Summary:**
+AI 生成了包含 `createOrder` 和 `payOrder` 方法的类。代码逻辑清晰，能处理正常的积分计算和 `PointRecord` 生成。
+
+**Curator Evaluation:**
+- **Issue 1 (Injection):** AI 试图使用 `@Inject PersistenceUtil`，但我之前的架构决策是使用静态工厂方法 `PersistenceUtil.getEntityManager()`。
+- **Issue 2 (Safety):** 代码缺乏防御性编程（资源泄漏风险、负数金额风险）。
+- 
+  **Action:** 采纳 AI 的业务流程（扣库存->算分->存订单），但**手动替换**了 `EntityManager` 的获取方式，并**重写**了事务控制代码结构。

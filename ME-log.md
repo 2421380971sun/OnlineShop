@@ -128,3 +128,18 @@ AI 推荐了一个基于 CDI 的 `JpaConfig` 方案，通过 `@Produces` / `@Dis
 
 **Correction:**
 实现 `PersistenceUtil` 工具类，通过 `Persistence.createEntityManagerFactory` 显式管理 `EntityManager` 的创建与关闭。虽然牺牲了部分依赖注入的优雅性，但显著降低了环境相关问题的排查难度，避免了 CDI 上下文未激活导致的隐性错误。
+
+---
+## 7. 模块：核心交易逻辑 (Order Processing) - 资源管理
+**Date:** 2025-12-28
+
+**Spec:** `OrderService` 需处理下单事务，并在 Tomcat 非托管环境下运行。
+
+**AI Generation Analysis:**
+根据 `web3.txt`，AI 生成的代码使用了 `em.getTransaction().begin()` 和 `commit()`。
+
+**Mental Execution (V&V):**
+- **Risk (Critical):** AI 的代码缺少 `try-catch-finally` 块。如果在扣减库存或保存订单时抛出 RuntimeException，`em.close()` 永远不会被调用。
+- **Consequence:** 数据库连接池（Connection Pool）会在几次并发请求后耗尽，导致系统假死。这是新手常犯的错误，AI 完美复刻了这个错误。
+- **Correction:** 我重写了事务模板，将业务逻辑包裹在 `try` 块中，并在 `finally` 块中强制执行 `if (em.isOpen()) em.close()`。
+- **Ref:** 参见 `OrderService.java`
