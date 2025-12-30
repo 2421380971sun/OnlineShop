@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>我的订单 - 在线购物平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6b7280, #3b82f6);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .title {
+            font-size: 2rem;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .welcome-text {
+            color: #4b5563;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .order-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .order-card {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        .order-card h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+        .order-card p {
+            margin: 0.3rem 0;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .action-btn.pay {
+            background: #10b981;
+            color: white;
+        }
+        .action-btn.pay:hover {
+            background: #059669;
+        }
+        .action-btn.cancel {
+            background: #ef4444;
+            color: white;
+        }
+        .action-btn.cancel:hover {
+            background: #dc2626;
+        }
+        .action-btn.points {
+            background: #3b82f6;
+            color: white;
+        }
+        .action-btn.points:hover {
+            background: #2563eb;
+        }
+        .empty-message {
+            text-align: center;
+            color: #4b5563;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+        }
+        .link {
+            color: #3b82f6;
+            text-decoration fournir
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .link-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .error-messages {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="container">
+        <h1 class="title">我的订单</h1>
+        <p class="welcome-text">查看和管理你的订单记录</p>
+
+        <!-- 错误信息 -->
+        <h:messages globalOnly="false" styleClass="error-messages" layout="table"/>
+
+        <h:form>
+            <!-- 订单卡片 -->
+            <div class="order-grid">
+                <ui:repeat value="#{orderController.orders}" var="order">
+                    <div class="order-card">
+                        <h3>订单 #{order.id}</h3>
+                        <p>日期：<h:outputText value="#{order.orderDate}">
+                            <f:converter converterId="localDateTimeConverter"/>
+                        </h:outputText></p>
+                        <p>金额：￥#{order.totalAmount}</p>
+                        <p>状态：#{order.status}</p>
+                        <p>使用积分：#{order.pointsUsed > 0 ? order.pointsUsed : '无'}</p>
+                        <p>商品：
+                            <ui:repeat value="#{order.orderItems}" var="item">
+                                #{item.product.name} (x#{item.quantity})<br/>
+                            </ui:repeat>
+                        </p>
+                        <div class="order-actions">
+                            <h:commandLink value="支付" action="#{orderController.payOrder(order.id)}"
+                                           styleClass="action-btn pay"
+                                           rendered="#{order.status == 'PENDING'}"/>
+                            <h:commandLink value="取消" action="#{orderController.cancelOrder(order.id)}"
+                                           styleClass="action-btn cancel"
+                                           rendered="#{order.status == 'PENDING'}"/>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+
+            <!-- 空状态 -->
+            <h:panelGroup rendered="#{orderController.orders == null or empty orderController.orders}">
+                <p class="empty-message">
+                    暂无订单，
+                    <h:commandLink value="去购物吧！" action="product_list.faces" styleClass="link">
+                        <f:param name="faces-redirect" value="true"/>
+                    </h:commandLink>
+                </p>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form>
+            <div class="link-container">
+                <h:commandLink value="返回商品列表" action="#{orderController.goToProductList}" styleClass="link"/>
+                <h:commandLink value="我的积分" action="#{pointController.goToPoints}" styleClass="link"
+                               rendered="#{authController.isLoggedIn()}"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>
