@@ -76,6 +76,7 @@ AI 生成了标准的 JavaBean 代码，包含了所有请求的字段、Getter/
 
 **Action:** 接受 AI 生成的大部分样板代码（Getter/Setter/JPA注解），但在合并到代码库时，**手动将 `role` 字段重构为枚举类型**，并修改了对应的数据库映射配置。  
 *(Self-Correction: 下次 Prompt 应直接要求生成 Enum 类型)*
+
 ---
 ## Interaction 6: 业务服务层实现 (Service Layer)
 **Context:** 有了实体后，需要实现业务逻辑。
