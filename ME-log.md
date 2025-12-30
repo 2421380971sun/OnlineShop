@@ -2,6 +2,10 @@
 
 ---
 
+AI-chat URL：[https://chat.deepseek.com/share/8kzb22ujbudbntvgvv](https://chat.deepseek.com/share/8kzb22ujbudbntvgvv)
+
+---
+
 ## 1. 模块：用户注册逻辑 (User Registration)
 
 **Date:** 2025-12-23

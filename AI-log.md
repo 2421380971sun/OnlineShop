@@ -1,6 +1,11 @@
 # AI Interaction Log (AI-log)
 
 ---
+
+AI-chat URL：[https://chat.deepseek.com/share/8kzb22ujbudbntvgvv](https://chat.deepseek.com/share/8kzb22ujbudbntvgvv)
+
+---
+
 ## Interaction 1: 技术栈与架构选型
 **Context:** 项目启动阶段，确定 Jakarta EE 技术栈。
 
