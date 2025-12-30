@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>用户管理 - 管理在线购物平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6b7280, #3b82f6);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .title {
+            color: #1f2937;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.9rem 1.5rem;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0.5rem;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        .error-messages {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+        .shake {
+            animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-1px); }
+            20%, 80% { transform: translateX(2px); }
+            30%, 50%, 70% { transform: translateX(-4px); }
+            40%, 60% { transform: translateX(4px); }
+        }
+    </style>
+    <h:outputScript>
+        /* <![CDATA[ */
+        document.addEventListener('DOMContentLoaded', function() {
+            var messages = document.querySelector('.error-messages');
+            if (messages && messages.innerHTML.trim() !== '') {
+                var inputs = document.querySelectorAll('.form-input');
+                inputs.forEach(function(input) {
+                    input.classList.add('shake');
+                    setTimeout(function() { input.classList.remove('shake'); }, 400);
+                });
+            }
+        });
+        /* ]]> */
+    </h:outputScript>
+</h:head>
+<h:body>
+    <div class="container">
+        <h:form rendered="#{authController.loggedIn and authController.currentUser.role == 'ADMIN'}">
+            <h1 class="title">用户管理</h1>
+            <h:messages globalOnly="false" styleClass="error-messages"/>
+
+            <!-- 用户列表 -->
+            <h2>所有用户</h2>
+            <h:dataTable value="#{userController.users}" var="user">
+                <h:column>
+                    <f:facet name="header">ID</f:facet>
+                    #{user.id}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">用户名</f:facet>
+                    #{user.username}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">昵称</f:facet>
+                    #{user.nickname}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">积分</f:facet>
+                    #{user.points}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">角色</f:facet>
+                    #{user.role}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">操作</f:facet>
+                    <h:commandLink value="编辑" action="#{userController.editUser(user.id)}" styleClass="btn"/>
+                </h:column>
+            </h:dataTable>
+
+            <!-- 编辑用户 -->
+            <h:panelGroup rendered="#{userController.selectedUser != null}">
+                <h2>编辑用户</h2>
+                <div class="form-group">
+                    <h:outputLabel for="nickname" value="昵称" styleClass="form-label"/>
+                    <h:inputText id="nickname" value="#{userController.selectedUser.nickname}"
+                                 required="true" requiredMessage="昵称不能为空"
+                                 styleClass="form-input"/>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="points" value="积分" styleClass="form-label"/>
+                    <h:inputText id="points" value="#{userController.selectedUser.points}"
+                                 required="true" requiredMessage="积分不能为空"
+                                 styleClass="form-input">
+                        <f:convertNumber integerOnly="true"/>
+                        <f:validateLongRange minimum="0"/>
+                    </h:inputText>
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="role" value="角色" styleClass="form-label"/>
+                    <h:selectOneMenu id="role" value="#{userController.selectedUser.role}"
+                                     required="true" requiredMessage="角色不能为空"
+                                     styleClass="form-input">
+                        <f:selectItem itemValue="ADMIN" itemLabel="管理员"/>
+                        <f:selectItem itemValue="USER" itemLabel="用户"/>
+                    </h:selectOneMenu>
+                </div>
+                <h:commandButton value="保存" action="#{userController.saveUser}" styleClass="btn"/>
+                <h:commandLink value="取消" action="#{userController.cancelEdit}" styleClass="btn"/>
+            </h:panelGroup>
+
+            <!-- 返回 -->
+            <h:commandLink value="返回商品列表" action="product_list?faces-redirect=true" styleClass="btn"/>
+            <h:commandLink value="退出登录" action="#{authController.logout}" styleClass="btn"/>
+        </h:form>
+        <h:panelGroup rendered="#{!authController.loggedIn}">
+            <h1>请登录</h1>
+            <h:commandLink value="返回登录" action="login?faces-redirect=true" styleClass="btn"/>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{authController.loggedIn and authController.currentUser.role != 'ADMIN'}">
+            <h1>权限不足</h1>
+            <h:outputText value="仅管理员可访问此页面"/>
+            <h:commandLink value="退出登录" action="#{authController.logout}" styleClass="btn"/>
+        </h:panelGroup>
+    </div>
+</h:body>
+</html>

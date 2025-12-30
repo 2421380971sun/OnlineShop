@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>#{productController.product.id == null ? '添加商品' : '编辑商品'} - 在线购物平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6b7280, #3b82f6);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .title {
+            font-size: 2rem;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .welcome-text {
+            color: #4b5563;
+            text-align: center;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        .btn {
+            padding: 0.9rem 2rem;
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-cancel {
+            background: #ef4444;
+        }
+        .btn-cancel:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+        .error-messages {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+        .link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .link-container {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="container">
+        <h1 class="title">#{productController.product.id == null ? '添加商品' : '编辑商品'}</h1>
+        <p class="welcome-text">为平台添加新商品或更新现有商品信息</p>
+
+        <!-- 错误信息 -->
+        <h:messages globalOnly="false" styleClass="error-messages" layout="table"/>
+
+        <h:form>
+            <div class="form-group">
+                <h:outputLabel for="name" value="商品名称" styleClass="form-label"/>
+                <h:inputText id="name" value="#{productController.product.name}"
+                             required="true" requiredMessage="商品名称不能为空"
+                             styleClass="form-input">
+                    <f:validateLength minimum="2" maximum="100"/>
+                </h:inputText>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="description" value="描述" styleClass="form-label"/>
+                <h:inputTextarea id="description" value="#{productController.product.description}"
+                                 styleClass="form-textarea"/>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="price" value="价格" styleClass="form-label"/>
+                <h:inputText id="price" value="#{productController.product.price}"
+                             required="true" requiredMessage="价格不能为空"
+                             styleClass="form-input">
+                    <f:validateDoubleRange minimum="0.01" maximum="1000000"/>
+                    <f:convertNumber minFractionDigits="2"/>
+                </h:inputText>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="stock" value="库存" styleClass="form-label"/>
+                <h:inputText id="stock" value="#{productController.product.stock}"
+                             required="true" requiredMessage="库存不能为空"
+                             styleClass="form-input">
+                    <f:validateLongRange minimum="0" maximum="100000"/>
+                </h:inputText>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="category" value="分类" styleClass="form-label"/>
+                <h:selectOneMenu id="category" value="#{productController.product.category}"
+                                 required="true" requiredMessage="分类不能为空"
+                                 styleClass="form-select">
+                    <f:selectItem itemLabel="电子产品" itemValue="电子产品"/>
+                    <f:selectItem itemLabel="服装" itemValue="服装"/>
+                    <f:selectItem itemLabel="食品" itemValue="食品"/>
+                </h:selectOneMenu>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="imageUrl" value="图片 URL" styleClass="form-label"/>
+                <h:inputText id="imageUrl" value="#{productController.product.imageUrl}"
+                             styleClass="form-input"/>
+            </div>
+            <div class="form-group button-group">
+                <h:commandButton value="保存" action="#{productController.addProduct}" styleClass="btn"/>
+                <h:commandButton value="取消" action="#{productController.cancelAddProduct}"
+                                 styleClass="btn btn-cancel" immediate="true"/>
+            </div>
+        </h:form>
+
+        <div class="link-container">
+            <h:link outcome="product_list" styleClass="link">
+                返回商品列表
+            </h:link>
+        </div>
+    </div>
+</h:body>
+</html>

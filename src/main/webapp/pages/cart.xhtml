@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+    <title>购物车 - 在线购物平台</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #6b7280, #3b82f6);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .title {
+            font-size: 2rem;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        .cart-table th, .cart-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .cart-table th {
+            background: #f3f4f6;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        .cart-table td {
+            color: #4b5563;
+        }
+        .cart-table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .quantity-input {
+            width: 60px;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .action-btn.update {
+            background: #3b82f6;
+            color: white;
+        }
+        .action-btn.update:hover {
+            background: #2563eb;
+        }
+        .action-btn.remove {
+            background: #ef4444;
+            color: white;
+        }
+        .action-btn.remove:hover {
+            background: #dc2626;
+        }
+        .action-btn.submit {
+            background: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+        .action-btn.submit:hover {
+            background: #059669;
+        }
+        .total-section {
+            text-align: right;
+            margin-top: 1.5rem;
+            color: #1f2937;
+            font-size: 1.1rem;
+        }
+        .points-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        .points-section label {
+            font-weight: 500;
+            color: #1f2937;
+            margin-right: 1rem;
+        }
+        .points-section input {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            width: 100px;
+        }
+        .points-section p {
+            color: #4b5563;
+            margin: 0.5rem 0;
+        }
+        .empty-message {
+            text-align: center;
+            color: #4b5563;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+        }
+        .link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .link:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+        .error-messages {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #dc2626;
+        }
+    </style>
+</h:head>
+<h:body>
+    <div class="container">
+        <h1 class="title">我的购物车</h1>
+
+        <!-- 错误信息 -->
+        <h:messages globalOnly="false" styleClass="error-messages" layout="table"/>
+
+        <h:form>
+            <h:dataTable value="#{orderController.cartItems}" var="item" styleClass="cart-table"
+                         rendered="#{not empty orderController.cartItems}">
+                <h:column>
+                    <f:facet name="header">商品</f:facet>
+                    <h:graphicImage value="#{item.product.imageUrl}" style="width: 80px; height: 80px;"/>
+                    <h:outputText value="#{item.product.name}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">单价</f:facet>
+                    <h:outputText value="￥#{item.product.price}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">数量</f:facet>
+                    <h:inputText value="#{item.quantity}" styleClass="quantity-input"/>
+                    <h:commandLink value="更新" action="#{orderController.updateCartItem(item.product.id, item.quantity)}"
+                                   styleClass="action-btn update"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">小计</f:facet>
+                    <h:outputText value="￥#{item.quantity * item.product.price}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">操作</f:facet>
+                    <h:commandLink value="删除" action="#{orderController.removeFromCart(item.product.id)}"
+                                   styleClass="action-btn remove"/>
+                </h:column>
+            </h:dataTable>
+
+            <!-- 空状态 -->
+            <h:panelGroup rendered="#{empty orderController.cartItems}">
+                <p class="empty-message">
+                    购物车为空，
+                    <h:commandLink value="去购物吧！" action="product_list.faces" styleClass="link">
+                        <f:param name="faces-redirect" value="true"/>
+                    </h:commandLink>
+                </p>
+            </h:panelGroup>
+
+            <!-- 积分抵扣 -->
+            <h:panelGroup rendered="#{not empty orderController.cartItems and authController.isLoggedIn()}">
+                <div class="points-section">
+                    <p>当前可用积分：#{authController.currentUser.points}</p>
+                    <h:outputLabel value="使用积分（100积分 = 1元）：" for="pointsToUse"/>
+                    <h:inputText id="pointsToUse" value="#{orderController.pointsToUse}" styleClass="points-section input"/>
+                    <h:commandButton value="应用积分" action="#{orderController.applyPoints}" styleClass="action-btn update"/>
+                    <h:panelGroup rendered="#{orderController.pointsDiscount > 0}">
+                        <p>积分抵扣：￥#{orderController.pointsDiscount}</p>
+                    </h:panelGroup>
+                </div>
+            </h:panelGroup>
+
+            <!-- 总计和提交 -->
+            <h:panelGroup rendered="#{not empty orderController.cartItems}">
+                <div class="total-section">
+                    <p>总计：￥#{orderController.cartTotal}</p>
+                    <h:commandButton value="提交订单" action="#{orderController.submitOrder}"
+                                     styleClass="action-btn submit"/>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form>
+            <h:commandLink value="返回商品列表" action="#{orderController.goToProductList}" styleClass="link"/>
+        </h:form>
+    </div>
+</h:body>
+</html>
