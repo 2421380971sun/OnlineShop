@@ -143,3 +143,74 @@ AI 推荐了一个基于 CDI 的 `JpaConfig` 方案，通过 `@Produces` / `@Dis
 - **Consequence:** 数据库连接池（Connection Pool）会在几次并发请求后耗尽，导致系统假死。这是新手常犯的错误，AI 完美复刻了这个错误。
 - **Correction:** 我重写了事务模板，将业务逻辑包裹在 `try` 块中，并在 `finally` 块中强制执行 `if (em.isOpen()) em.close()`。
 - **Ref:** 参见 `OrderService.java`
+---
+
+
+## 8. 模块：前端交互 (Frontend Interaction) - Bean 初始化
+
+**Date:** 2025-12-28
+**Spec:** 用户访问 `register.xhtml` 进行注册。
+
+**AI Generation Analysis:**  
+AI 生成了页面，绑定了 `#{userController.user.username}`。同时生成了简单的 `UserController` 类。
+
+**Mental Execution (V&V):**
+- **Risk:** 当 JSF 渲染页面时，它会试图调用 `userController.getUser().getUsername()`。如果 `UserController` 只是简单声明了 `private User user;` 而没有在构造函数或 `@PostConstruct` 中实例化它，`getUser()` 返回 null，进而抛出 `PropertyNotFoundException: Target Unreachable`。
+- **Correction:** 我手动修改了 `UserController`，添加了 `@PostConstruct public void init() { this.user = new User(); }` 确保对象存在。
+- **Ref:** 参见 `UserController.java` 。
+
+---
+## 9. 模块：商品管理 (Product Management) - 架构一致性
+
+**Date:** 2025-12-29  
+**Spec:** 实现商品的增删改查。
+
+**AI Generation Analysis:**  
+在 Prompt 中，我（或复制的 Prompt）提到“使用之前重构的 CDI Bean 方式注入 PersistenceUtil”。AI 顺从地使用了 `@Inject PersistenceUtil persistenceUtil;`。
+
+**Mental Execution (Consistency Check):**
+- **Conflict:** 在之前的 `OrderService` 和 `UserService` 中，我已经决定**放弃 CDI 注入 EntityManager**，改用 `PersistenceUtil.getEntityManager()` 静态方法，因为在 Tomcat 这种非全栈服务器上配置 CDI 的 JPA 生产者太麻烦且不稳定。
+- **Decision:** 我必须推翻 Prompt 的指令，强制统一架构。如果现在混合使用 `@Inject` 和静态调用，代码将变得难以维护。
+- **Correction:** 我手动修改了 AI 生成的 `ProductService`，将所有的 `@Inject` 替换为 `PersistenceUtil.getEntityManager()`，并在 `finally` 块中关闭连接。
+- **Ref:** 参见 `ProductService.java` 。
+
+----
+## 10. 模块：Web Service (SOAP) - 环境配置
+
+**Date:** 2025-12-30  
+**Spec:** 提供查询积分的 SOAP 接口。
+
+**AI Generation Analysis:**  
+AI 生成了标准的 JAX-WS 代码 (`@WebService`) 和 `web.xml` 监听器配置。
+
+**Mental Execution (Deployment):**
+- **Gap:** Tomcat 本身不带 JAX-WS 运行时（不像 GlassFish 或 Payara）。仅有 Java 代码和 `web.xml` 是不够的，跑起来会报 `ClassNotFound` 或 `Servlet` 初始化错误。
+- **Correction:**
+    1. 我需要手动添加 `sun-jaxws.xml` 配置文件到 `WEB-INF` 下，定义 endpoint 实现类。
+    2. 确认 `pom.xml` 中是否有 JAX-WS 的运行时依赖（如 `com.sun.xml.ws:jaxws-rt`）。
+- **Ref:** 参见 `sun-jaxws.xml` 。
+
+---
+## 11. 模块：前端日期显示 (Frontend Date Formatting)
+
+**Date:** 2025-12-30  
+**Spec:** 在订单列表页显示 `created_at` 时间，格式要求 `yyyy-MM-dd HH:mm:ss`。
+
+**AI Generation Analysis:**  
+AI 在 `order_list.xhtml` 中使用了标准的 JSF 转换器：
+```xhtml
+<h:outputText value="#{order.createdAt}">
+    <f:convertDateTime type="localDateTime" pattern="yyyy-MM-dd HH:mm:ss"/>
+</h:outputText>
+```
+
+**Mental Execution (Technology Decision):**
+- **Observation:** AI 建议使用 JSF 2.3+ 引入的对 Java 8 Time API 的原生支持。
+- **Risk Analysis:** 虽然这是标准写法，但在非完整的 Jakarta EE 容器（如 Tomcat）中，依赖具体的 EL 实现版本（UEL）。有时在处理 `null` 值或特定时区转换时，原生标签的表现不如预期稳定，且错误日志晦涩。
+- **Decision:** 我决定编写一个显式的 `LocalDateTimeConverter` (实现 `jakarta.faces.convert.Converter`)。
+    1. **Control:** 能更精细地控制解析异常。
+    2. **Consistency:** 确保所有页面使用统一的 `DateTimeFormatter`，遵循 DRY 原则。
+    3. **Compatibility:** 彻底解耦 JSF 版本差异带来的潜在 bug。
+
+**Correction:**  
+忽略 AI 的 `<f:convertDateTime>` 建议，创建 `LocalDateTimeConverter.java`，并在页面中使用 `converter="localDateTimeConverter"`。
